@@ -43,3 +43,6 @@ There is an issue with the Clay option which should include Kind dependencies as
 
 # WordPress Plugin Demo
 Demonstrates embedding the content on WordPress Admin panel. To install, place `wp-plugin-example` in `path-to-www-root/wp-content/plugins/` and activate it in plugins panel.
+
+![Screenshot_20240810_124013](https://github.com/user-attachments/assets/40a7694a-febf-4472-bde6-1277a2bfc0ca)
+
