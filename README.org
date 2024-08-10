@@ -17,6 +17,7 @@ Code is not reloaded after changes as in https://ericnormand.me/guide/clojure-we
 View code is duplicated just to keep it simple.
 
 * Clay example notes
+Examples from Clay docs are used with some changes for randomizing data between requests https://scicloj.github.io/clay/clay_book.examples.html.
 ** Problems with more complex deps
 Some examples had more trouble rendering, eg. because of more complicated dependencies. Some failing examples:
 - Vega
@@ -24,8 +25,9 @@ Some examples had more trouble rendering, eg. because of more complicated depend
 - 3DMol.js (not included)
 - D3 (not included)
 - Portal
+- Datatable (does not load dependency for styling)
 
-https://scicloj.github.io/clay/clay_book.examples.html
+See JS console for hints..
 
 ** inline-js-and-css is not working
 There is an issue with the Clay option which should include Kind dependencies as inline script at the moment.
