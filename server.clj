@@ -11,7 +11,6 @@
             [scicloj.clay.v2.api :as clay]
             [scicloj.kindly.v4.kind :as kind]
 
-            [ns-with-dataset]
             [clay-examples]))
 
 
@@ -28,16 +27,13 @@
       (http-response/content-type "text/html")))
 
 
-(defn kind->div "Converts Clay Kind into a single hiccup div" [kind]
-  (->> (clay/make-hiccup {:single-value kind})
-       ;; TODO experiment with :inline-js-and-css true
-       (into [:div])))
-
 
 ;; Define views as in https://github.com/kit-clj/modules/blob/master/htmx/assets/src/ui.clj
 
-;; TODO separate view with :inline-js-and-css and no css loaded on toplevel
-(defn home "Initial view" [request]
+
+;;;; View 1 testing without :inline-js-and-css
+
+(defn clay-demo-view "Initial view with Clay dependencies included as separate script tags from CDN's" [request]
   (page
    [:head
     [:meta {:charset "UTF-8"}]
@@ -54,9 +50,60 @@
 
    [:body
 
-    [:h1 "Clay Ring HTMX demo (without :inline-js-and-css)"]
+    [:h4 "Clay Ring HTMX demo (without :inline-js-and-css)"]
+    [:a {:href "/inline-js-and-css"} "Enable :inline-js-and-css"]
 
-    [:form {:hx-post "/clay-demo" :hx-target "#results-div" :hx-swap "innerHTML"}
+    [:form {:hx-post "/echo" :hx-target "#results-div" :hx-swap "innerHTML"}
+     [:input {:type "text" :name "form-input"}]
+     [:button {:type "submit"} "Dummy echo test"]]
+
+    [:form {:hx-post "/clay-demo-partial" :hx-target "#results-div" :hx-swap "innerHTML"}
+     [:p "Select <a href='https://scicloj.github.io/clay/clay_book.examples.html'
+                    target='_blank'>Clay example</a> to render in #results-div beneath"]
+
+     [:select {:name "form-input"}
+      (for [item (keys clay-examples/kind-example-fns)]
+        [:option {:value item} item])]
+     [:button {:type "submit"} "Render"]]
+
+    [:div#results-div]
+    ]))
+
+(defn kind->div
+  "Converts Clay Kind into a single hiccup div"
+  [kind]
+  (->> (clay/make-hiccup {:single-value kind})
+       (into [:div])))
+
+(defn clay-demo-partial [request]
+  (println (clojure.pprint/pprint request))
+  (let [form-input (get (:form-params request) "form-input")
+        kind-fn ((keyword form-input) clay-examples/kind-example-fns)]
+    (ui
+     (kind->div (kind-fn)))
+    ))
+
+
+;;;; View 2. testing :inline-js-and-css
+
+(defn clay-demo-inline-view "View testing :inline-js-and-css" [request]
+  (page
+   [:head
+    [:meta {:charset "UTF-8"}]
+    [:title "Clay + Htmx demo"]
+    [:script {:src "https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js" :defer true}]
+    [:script {:src "https://unpkg.com/hyperscript.org@0.9.12" :defer true}] ; not used for this demo
+    ]
+   [:body
+
+    [:h4 "Clay Ring HTMX demo (with :inline-js-and-css)"]
+    [:a {:href "/"} "Disable :inline-js-and-css"]
+
+    [:form {:hx-post "/echo" :hx-target "#results-div" :hx-swap "innerHTML"}
+     [:input {:type "text" :name "form-input"}]
+     [:button {:type "submit"} "Dummy echo test"]]
+
+    [:form {:hx-post "/clay-demo-inline-partial" :hx-target "#results-div" :hx-swap "innerHTML"}
      [:p "Select <a href='https://scicloj.github.io/clay/clay_book.examples.html'
                     target='_blank'>Clay example</a> to render in #results-div beneath"]
      [:select {:name "form-input"}
@@ -64,48 +111,64 @@
         [:option {:value item} item])]
      [:button {:type "submit"} "Render"]]
 
-    ;; [:form {:hx-post "/product-history" :hx-target "#results-div" :hx-swap "innerHTML"}
-    ;;  [:p "Enter data to process on the server and replace #results-div"]
-    ;;  [:input {:type "text" :name "form-input"}]  ; could pass
-    ;;  [:button {:type "submit"} "Render"]]
-
     [:div#results-div]
     ]))
 
-(defn clay-demo-partial [request]
+
+(defn kind->div-inline
+  "Converts Clay Kind into a single hiccup div with inline assets.
+   Duplicate `kind->div` code for clarity."
+  [kind]
+  (->> (clay/make-hiccup {:single-value kind :inline-js-and-css true})
+       (into [:div])))
+
+
+(defn clay-demo-inline-partial [request]
   (println (clojure.pprint/pprint request))
   (let [form-input (get (:form-params request) "form-input")
         kind-fn ((keyword form-input) clay-examples/kind-example-fns)]
     (ui
-     (kind->div (kind-fn))
-     ;;[:div (str clojure.pprint/pprint (first data))]
-     )
-    ))
+     (kind->div-inline (kind-fn)))))
 
-(defn product-history [request]
+
+;;;; Dummy echo endpoint
+
+(defn echo [request]
   (println (clojure.pprint/pprint request))
-  (let [form-input (get (:form-params request) "form-input")
-        data ns-with-dataset/ds]
-    (ui
-     [:div (str clojure.pprint/pprint (first data))]
-     )
-    ))
+  (let [form-input (get (:form-params request) "form-input")]
+    (ui [:h1 form-input])))
 
-(def routes [{:path "/"
+
+;;;; Routes
+
+(def routes [;; View 1
+             {:path "/"
               :method :get
-              :response home ;;{:status 200 :body "Hi there!"}
+              :response clay-demo-view ;;{:status 200 :body "Hi there!"}
               }
-             {:path "/clay-demo"
+             {:path "/clay-demo-partial"
               :method :post
               :response clay-demo-partial}
 
-             {:path "/product-history"
+             ;; View 2
+             {:path "/inline-js-and-css"
+              :method :get
+              :response clay-demo-inline-view
+              }
+             {:path "/clay-demo-inline-partial"
               :method :post
-              :response product-history}
+              :response clay-demo-inline-partial}
+
+             ;; Dummy view
+             {:path "/echo"
+              :method :post
+              :response echo}
              ])
 
 
-;; Simple server setup reference:
+;;;;; Simple server setup
+
+;; Reference:
 ;; - https://ericnormand.me/guide/clojure-web-tutorial
 ;; - https://github.com/askonomm/ruuter?tab=readme-ov-file#setting-up-with-ring--jetty
 
@@ -132,7 +195,4 @@
 (-main)
 (comment
   (stop-server)
-
-  ns-with-dataset/ds
-
   )
