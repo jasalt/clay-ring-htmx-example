@@ -11,7 +11,8 @@
             [scicloj.clay.v2.api :as clay]
             [scicloj.kindly.v4.kind :as kind]
 
-            [ns-with-dataset]))
+            [ns-with-dataset]
+            [clay-examples]))
 
 
 ;; HTMX helper functions from https://github.com/kit-clj/modules/blob/master/htmx/assets/src/htmx.clj
@@ -57,19 +58,9 @@
     ]))
 
 
-(defn clicked "Demo route" [request]
+(defn clicked "Demo route" [_]
   (ui
-   (kind->div (kind/plotly
-          {:data [{:x [0 1 3 2]
-                   :y [0 6 4 5]
-                   :z [0 8 9 7]
-                   :type :scatter3d
-                   :mode :lines+markers
-                   :opacity 0.5
-                   :line {:width 5}
-                   :marker {:size 4
-                            :colorscale :Viridis}}]
-           :layout {:title "Plotly example"}}))))
+   (kind->div (:plotly clay-examples/kind-examples))))
 
 (defn product-history [request]
   (println (clojure.pprint/pprint request))
@@ -120,4 +111,7 @@
 
 (comment
   (stop-server)
+
+  ns-with-dataset/ds
+
   )
