@@ -44,15 +44,21 @@
     [:title "Clay + Htmx demo"]
     [:script {:src "https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js" :defer true}]
     [:script {:src "https://unpkg.com/hyperscript.org@0.9.12" :defer true}] ; not used for this demo
+    [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" :defer true}]
+    [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/vega-embed/6.26.0/vega-embed.js" :defer true}]
     [:script {:src "https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.js" :defer true}] ; demos not working with this
     [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js" :defer true}]
+    [:script {:src "https://code.highcharts.com/highcharts.js" :defer true}]
     [:script {:src "https://cdn.plot.ly/plotly-2.34.0.min.js" :defer true}]] ;; clay "inline" plotly reference fails
+   [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" :defer true}]
+
    [:body
 
     [:h1 "Clay Ring HTMX demo (without :inline-js-and-css)"]
 
     [:form {:hx-post "/clay-demo" :hx-target "#results-div" :hx-swap "innerHTML"}
-     [:p "Select Clay example to render in #results-div beneath"]
+     [:p "Select <a href='https://scicloj.github.io/clay/clay_book.examples.html'
+                    target='_blank'>Clay example</a> to render in #results-div beneath"]
      [:select {:name "form-input"}
       (for [item (keys clay-examples/kind-example-fns)]
         [:option {:value item} item])]
@@ -123,6 +129,7 @@
   (start-server)
   )
 
+(-main)
 (comment
   (stop-server)
 

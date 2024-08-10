@@ -43,7 +43,7 @@
   )
 
 (def kind-example-fns "Map of fn's that return kinds with randomized data"
-  {
+  {:tex (fn [] (kind/tex "x^2=\\alpha"))
    :pretty-printing (fn [] (kind/pprint (nested-structure-1)))
    :tables (fn [] (kind/table
                    {:column-names [:preferred-language :age]
@@ -53,12 +53,12 @@
                         :column-names [:preferred-language :age]
                         :row-vectors (people-as-vectors)}))
    :vega-lite-fails (fn [] (kind/vega-lite {:data {:values (random-data 10)},
-                                      :mark "point"
-                                      :encoding
-                                      {:size {:field "w" :type "quantitative"}
-                                       :x {:field "x", :type "quantitative"},
-                                       :y {:field "y", :type "quantitative"},
-                                       :fill {:field "z", :type "nominal"}}}))
+                                            :mark "point"
+                                            :encoding
+                                            {:size {:field "w" :type "quantitative"}
+                                             :x {:field "x", :type "quantitative"},
+                                             :y {:field "y", :type "quantitative"},
+                                             :fill {:field "z", :type "nominal"}}}))
    :cytoscape (fn [] (kind/cytoscape
                       {:elements {:nodes [{:data {:id "a" :parent "b"} :position {:x (rand-int 300) :y (rand-int 10)}}
                                           {:data {:id "b"}}
@@ -133,4 +133,27 @@
                                               :chartOptions {:legend {:layout "horizontal",
                                                                       :align "center",
                                                                       :verticalAlign "bottom"}}}]}}))
+   :leaflet-fails (fn [] (kind/reagent
+                          ['(fn []
+                              [:div {:style {:height "200px"}
+                                     :ref (fn [el]
+                                            (let [m (-> js/L
+                                                        (.map el)
+                                                        (.setView (clj->js [51.505 -0.09])
+                                                                  13))]
+                                              (-> js/L
+                                                  .-tileLayer
+                                                  (.provider "OpenStreetMap.Mapnik")
+                                                  (.addTo m))
+                                              (-> js/L
+                                                  (.marker (clj->js [51.5 -0.09]))
+                                                  (.addTo m)
+                                                  (.bindPopup "A pretty CSS popup.<br> Easily customizable.")
+                                                  (.openPopup))))}])]
+                          ;; Note we need to mention the dependency:
+                          {:html/deps [:leaflet]}))
+   :video (fn [] (kind/video {:youtube-id "DAQnvAgBma8"
+                              :iframe-width 480
+                              :iframe-height 270}))
+   :portal-fails (fn [] (kind/portal {:x (range 3)}))
    })
