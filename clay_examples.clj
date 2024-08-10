@@ -17,8 +17,8 @@
   (->> people-as-maps
        (mapv (juxt :preferred-language :age))))
 
-(def nested-structure-1
-  {:vector-of-numbers [2 9 -1]
+(defn nested-structure-1 []
+  {:vector-of-numbers (vec (repeatedly 3 #(- (rand-int 21) 10)))
    :vector-of-different-things ["hi"
                                 (kind/hiccup
                                  [:big [:big "hello"]])]
@@ -29,9 +29,9 @@
    :dataset (tc/dataset {:x (range 3)
                          :y [:A :B :C]})})
 
-(def kind-examples
+(def kind-example-fns "returns fn's that return kinds with randomized data"
   {
-   :pretty-printing (kind/pprint nested-structure-1)
+   :pretty-printing (kind/pprint (nested-structure-1))
    :tables (kind/table
             {:column-names [:preferred-language :age]
              :row-vectors people-as-vectors})
@@ -56,15 +56,15 @@
                                :target-arrow-shape "triangle"}}]
                 :layout {:name "preset"
                          :padding 5}})
-   :plotly (kind/plotly
-            {:data [{:x [0 1 3 2]
-                     :y [0 6 4 5]
-                     :z [0 8 9 7]
-                     :type :scatter3d
-                     :mode :lines+markers
-                     :opacity 0.5
-                     :line {:width 5}
-                     :marker {:size 4
-                              :colorscale :Viridis}}]
-             :layout {:title "Plotly example"}})
+   :plotly (fn [] (kind/plotly
+                   {:data [{:x (vec (repeatedly 4 #(rand-int 10)))
+                            :y (vec (repeatedly 4 #(rand-int 10)))
+                            :z (vec (repeatedly 4 #(rand-int 10)))
+                            :type :scatter3d
+                            :mode :lines+markers
+                            :opacity 0.5
+                            :line {:width 5}
+                            :marker {:size 4
+                                     :colorscale :Viridis}}]
+                    :layout {:title "Plotly example"}}))
    })
