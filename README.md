@@ -1,5 +1,7 @@
 Minimal tester web app serving Clay Kinds as HTML with Ring.
 
+![demo](https://github.com/user-attachments/assets/36845bde-a05f-4a23-a0b5-5b6616fcb541)
+
 # Usage
 
 ## Editor
