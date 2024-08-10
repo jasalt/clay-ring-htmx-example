@@ -39,7 +39,7 @@ See JS console for hints..
 
 ## inline-js-and-css is not working
 
-There is an issue with the Clay option which should include Kind dependencies as inline script at the moment.
+There is an issue with the Clay option which should include Kind dependencies as inline script at the moment https://github.com/scicloj/clay/issues/144.
 
 # WordPress Plugin Demo
 Demonstrates embedding the content on WordPress Admin panel. To install, place `wp-plugin-example` in `path-to-www-root/wp-content/plugins/` and activate it in plugins panel.
