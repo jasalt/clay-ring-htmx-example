@@ -49,9 +49,19 @@
 
     [:h1 "Clay Ring HTMX demo"]
 
+    [:form {:hx-post "/clay-example" :hx-target "#results-div" :hx-swap "innerHTML"}
+     [:p "Select Clay example to render in #results-div"]
+     [:select {:name "form-input"}
+      (for [item (keys clay-examples/kind-example-fns)]
+        [:option {:value item} item]
+        )
+      ]
+     [:button {:type "submit"} "Render"]]
+
     [:form {:hx-post "/product-history" :hx-target "#results-div" :hx-swap "innerHTML"}
-     [:input {:type "text" :name "form-input"}]
-     [:button {:type "submit"} "SEND"]]
+     [:p "Enter data to process on the server and replace #results-div"]
+     [:input {:type "text" :name "form-input"}]  ; could pass
+     [:button {:type "submit"} "Render"]]
 
     [:button {:hx-post "/clicked" :hx-target "#results-div" :hx-swap "innerHTML"} "Show random Plotly plot"]
     [:div#results-div]
@@ -60,7 +70,16 @@
 
 (defn clicked "Demo route" [_]
   (ui
-   (kind->div (:plotly clay-examples/kind-examples))))
+   (kind->div ((:plotly clay-examples/kind-example-fns)) )))
+
+(defn clay-demo-view [request]
+  (println (clojure.pprint/pprint request))
+  (let [form-input (get (:form-params request) "form-input")
+        data ns-with-dataset/ds]
+    (ui
+     [:div (str clojure.pprint/pprint (first data))]
+     )
+    ))
 
 (defn product-history [request]
   (println (clojure.pprint/pprint request))
@@ -82,6 +101,9 @@
              {:path "/product-history"
               :method :post
               :response product-history}
+             {:path "/clay-demo"
+              :method :post
+              :response clay-demo-view}
              ])
 
 
