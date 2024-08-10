@@ -36,6 +36,7 @@
 
 ;; Define views as in https://github.com/kit-clj/modules/blob/master/htmx/assets/src/ui.clj
 
+;; TODO separate view with :inline-js-and-css and no css loaded on toplevel
 (defn home "Initial view" [request]
   (page
    [:head
@@ -44,10 +45,11 @@
     [:script {:src "https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js" :defer true}]
     [:script {:src "https://unpkg.com/hyperscript.org@0.9.12" :defer true}] ; not used for this demo
     [:script {:src "https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.js" :defer true}] ; demos not working with this
+    [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js" :defer true}]
     [:script {:src "https://cdn.plot.ly/plotly-2.34.0.min.js" :defer true}]] ;; clay "inline" plotly reference fails
    [:body
 
-    [:h1 "Clay Ring HTMX demo"]
+    [:h1 "Clay Ring HTMX demo (without :inline-js-and-css)"]
 
     [:form {:hx-post "/clay-demo" :hx-target "#results-div" :hx-swap "innerHTML"}
      [:p "Select Clay example to render in #results-div beneath"]
@@ -61,7 +63,6 @@
     ;;  [:input {:type "text" :name "form-input"}]  ; could pass
     ;;  [:button {:type "submit"} "Render"]]
 
-    [:button {:hx-post "/clicked" :hx-target "#results-div" :hx-swap "innerHTML"} "Show random Plotly plot"]
     [:div#results-div]
     ]))
 
